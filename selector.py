@@ -37,7 +37,7 @@ class Selector:
 
 
 class MsgDecs:
-    PAGE_SIZE: int = 3
+    PAGE_SIZE: int = 20
 
     @staticmethod
     def filter_members(members: List[ChatMember]) -> List[ChatMember]:
