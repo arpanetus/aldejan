@@ -21,23 +21,13 @@ class Selector:
 
     async def get_admin_members(self) -> List[ChatMember]:
         return await self.app.get_chat_members(
-            self.chat_id, filter=Filters.ADMINISTRATORS
+            chat_id=self.chat_id, filter=Filters.ADMINISTRATORS
         )
 
     async def get_members(self) -> Set[ChatMember]:
-        count: int = await self.app.get_chat_members_count(self.chat_id)
-
-        print(f"There are {count} members in chat with id {self.chat_id}")
-
         members_set: Set[ChatMember] = set()
-        pages = count // self.PAGE_SIZE + ((count % self.PAGE_SIZE) != 0)
-
-        for page in range(pages):
-            members_set =  members_set.union(set(
-                await self.app.get_chat_members(
-                    self.chat_id, page, self.PAGE_SIZE, "", Filters.ALL
-                )
-            ))
+        async for members in self.app.iter_chat_members(self.chat_id, filter=Filters.ALL):
+            members_set.add(members)
         return members_set
 
 

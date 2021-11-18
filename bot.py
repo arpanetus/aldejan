@@ -23,6 +23,7 @@ import hashlib
 
 m = hashlib.sha256()
 m.update(str(API_ID + API_HASH + BOT_TOKEN + str(CHAT_ID)).encode())
+
 print(str(m.hexdigest()))
 
 guidelines = """Hello, {user}!
