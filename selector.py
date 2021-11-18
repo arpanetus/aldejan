@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Set
 from pyrogram.client import Client
 import logging
 import random
@@ -7,6 +7,10 @@ from pyrogram.types.user_and_chats import user
 
 from pyrogram.types.user_and_chats.chat_member import ChatMember
 
+def ch_mem_hashable(self: ChatMember):
+    return hash(self.user.id)
+
+ChatMember.__hash__ = ch_mem_hashable
 
 class Selector:
     PAGE_SIZE: int = 100
@@ -20,20 +24,21 @@ class Selector:
             self.chat_id, filter=Filters.ADMINISTRATORS
         )
 
-    async def get_members(self) -> List[ChatMember]:
+    async def get_members(self) -> Set[ChatMember]:
         count: int = await self.app.get_chat_members_count(self.chat_id)
 
-        logging.info(f"There are {count} members in chat with id {self.chat_id}")
-        members_list: List[ChatMember] = []
+        print(f"There are {count} members in chat with id {self.chat_id}")
+
+        members_set: Set[ChatMember] = set()
         pages = count // self.PAGE_SIZE + ((count % self.PAGE_SIZE) != 0)
 
         for page in range(pages):
-            members_list.extend(
+            members_set =  members_set.union(set(
                 await self.app.get_chat_members(
                     self.chat_id, page, self.PAGE_SIZE, "", Filters.ALL
                 )
-            )
-        return members_list
+            ))
+        return members_set
 
 
 class MsgDecs:
